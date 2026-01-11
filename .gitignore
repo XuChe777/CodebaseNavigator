@@ -1,3 +1,5 @@
+.cache/
+.venv/
 build/
 vcpkg_installed/
 CMakeUserPresets.json

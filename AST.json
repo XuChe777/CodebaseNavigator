@@ -1,0 +1,384 @@
+{
+    "files": [
+        {
+            "file name": "src/treesitter_example.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "int main(void)\n{\n    SymbolTable table = {0};\n    symbol_table_init(&table);\n    scan_directory(\"src\", index_file, &table);\n\n    for (size_t i = 0; i < table.vector_of_files.size; i++)\n    {\n        FileAST* ast = table.vector_of_files.items[i];\n\t\tputs(\"==============================================\");\n        printf(\"FILE %s\\n\", ast->file_name);\n        for (size_t j = 0; j < ast->symbols.size; j++)\n        {\n            Symbol* symbol = ast->symbols.items[j];\n            if (symbol->type == SYMBOL_FUNCTION)\n            {\n\t\t\t\tputs(\"\\nFUNCTION\");\n\t\t\t\tfor(size_t k = 0; k < number_of_function_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = function_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n            else if (symbol->type == SYMBOL_STRUCT)\n            {\n\t\t\t\tputs(\"\\nSTRUCT\");\n\t\t\t\tfor(size_t k = 0; k < number_of_struct_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = struct_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n            else if (symbol->type == SYMBOL_ENUM)\n            {\n                puts(\"\\nENUM\");\n\t\t\t\tfor(size_t k = 1; k < number_of_enum_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = enum_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n        }\n    }\n    symbol_table_free(&table);\n}",
+                    "function_declarator": "main(void)",
+                    "parameter_list": "(void)",
+                    "compound_statement": "{\n    SymbolTable table = {0};\n    symbol_table_init(&table);\n    scan_directory(\"src\", index_file, &table);\n\n    for (size_t i = 0; i < table.vector_of_files.size; i++)\n    {\n        FileAST* ast = table.vector_of_files.items[i];\n\t\tputs(\"==============================================\");\n        printf(\"FILE %s\\n\", ast->file_name);\n        for (size_t j = 0; j < ast->symbols.size; j++)\n        {\n            Symbol* symbol = ast->symbols.items[j];\n            if (symbol->type == SYMBOL_FUNCTION)\n            {\n\t\t\t\tputs(\"\\nFUNCTION\");\n\t\t\t\tfor(size_t k = 0; k < number_of_function_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = function_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n            else if (symbol->type == SYMBOL_STRUCT)\n            {\n\t\t\t\tputs(\"\\nSTRUCT\");\n\t\t\t\tfor(size_t k = 0; k < number_of_struct_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = struct_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n            else if (symbol->type == SYMBOL_ENUM)\n            {\n                puts(\"\\nENUM\");\n\t\t\t\tfor(size_t k = 1; k < number_of_enum_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = enum_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content)\n\t\t\t\t\t\tprintf(\"%-10s: %s\\n\", property, content);\n\t\t\t\t}\n            }\n        }\n    }\n    symbol_table_free(&table);\n}",
+                    "call_expression": "symbol_table_init(&table)",
+                    "identifier": "main",
+                    "type_identifier": "SymbolTable"
+                }
+            ]
+        },
+        {
+            "file name": "src/parser.h",
+            "symbols": [
+
+            ]
+        },
+        {
+            "file name": "src/parser.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "static char *json_escape_string(const char *src, size_t len) {\n    // Worst case: every char becomes \\u00XX (6 bytes)\n    size_t cap = len * 6 + 1;\n    char *dst = malloc(cap);\n    if (!dst) return NULL;\n\n    char *p = dst;\n\n    for (size_t i = 0; i < len; i++) {\n        unsigned char c = src[i];\n        switch (c) {\n        case '\\\"': *p++ = '\\\\'; *p++ = '\\\"'; break;\n        case '\\\\': *p++ = '\\\\'; *p++ = '\\\\'; break;\n        case '\\n': *p++ = '\\\\'; *p++ = 'n';  break;\n        case '\\r': *p++ = '\\\\'; *p++ = 'r';  break;\n        case '\\t': *p++ = '\\\\'; *p++ = 't';  break;\n        case '\\b': *p++ = '\\\\'; *p++ = 'b';  break;\n        case '\\f': *p++ = '\\\\'; *p++ = 'f';  break;\n        default:\n            if (c < 0x20) {\n                p += sprintf(p, \"\\\\u%04x\", c);\n            } else {\n                *p++ = c;\n            }\n        }\n    }\n\n    *p = '\\0';\n    return dst;\n}",
+                    "function_declarator": "json_escape_string(const char *src, size_t len)",
+                    "parameter_list": "(const char *src, size_t len)",
+                    "compound_statement": "{\n    // Worst case: every char becomes \\u00XX (6 bytes)\n    size_t cap = len * 6 + 1;\n    char *dst = malloc(cap);\n    if (!dst) return NULL;\n\n    char *p = dst;\n\n    for (size_t i = 0; i < len; i++) {\n        unsigned char c = src[i];\n        switch (c) {\n        case '\\\"': *p++ = '\\\\'; *p++ = '\\\"'; break;\n        case '\\\\': *p++ = '\\\\'; *p++ = '\\\\'; break;\n        case '\\n': *p++ = '\\\\'; *p++ = 'n';  break;\n        case '\\r': *p++ = '\\\\'; *p++ = 'r';  break;\n        case '\\t': *p++ = '\\\\'; *p++ = 't';  break;\n        case '\\b': *p++ = '\\\\'; *p++ = 'b';  break;\n        case '\\f': *p++ = '\\\\'; *p++ = 'f';  break;\n        default:\n            if (c < 0x20) {\n                p += sprintf(p, \"\\\\u%04x\", c);\n            } else {\n                *p++ = c;\n            }\n        }\n    }\n\n    *p = '\\0';\n    return dst;\n}",
+                    "call_expression": "malloc(cap)",
+                    "identifier": "json_escape_string",
+                    "comment": "// Worst case: every char becomes \\u00XX (6 bytes)"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void generate_json(SymbolTable* table_p)\n{\n    /** Example Format:\n    * {\n    *     \"name\": \"parse_packet\",\n    *     \"return_type\": \"int\",\n    *     \"parameters\": [\n    *         {\"type\": \"const uint8_t *\", \"name\": \"buf\"},\n    *         {\"type\": \"size_t\", \"name\": \"len\"}\n    *     ],\n    *     \"calls\": [\"malloc\", \"memcpy\"],\n    *     \"source\": \"int parse_packet(...) { ... }\"\n    * }\n\t*/\n\n\tFILE* file_p = fopen(\"AST.json\", \"w\");\n\n\tif (file_p == NULL) {\n        fprintf(stderr, \"Error Occurred While creating a file !\");\n\t\treturn;\n    }\n\n\tfputs(\"{\\n\", file_p);\n\tfputs(\"    \\\"files\\\": [\\n\", file_p);\n\n    for (size_t i = 0; i < table_p->vector_of_files.size; i++)\n    {\n        FileAST* ast = table_p->vector_of_files.items[i];\n\t\tif(i == 0)\n\t\t\tfputs(\"        {\\n\", file_p);\n\t\telse\n\t\t\tfputs(\",\\n        {\\n\", file_p);\n        fprintf(file_p, \"            \\\"file name\\\": \\\"%s\\\",\\n\", ast->file_name);\n        fputs(\"            \\\"symbols\\\": [\\n\", file_p);\n        for (size_t j = 0; j < ast->symbols.size; j++)\n        {\n\t\t\tif(j == 0)\n\t\t\t\tfputs(\"                {\\n\", file_p);\n\t\t\telse\n\t\t\t\tfputs(\",\\n                {\\n\", file_p);\n            Symbol* symbol = ast->symbols.items[j];\n            if (symbol->type == SYMBOL_FUNCTION)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"function\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_function_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = function_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n            else if (symbol->type == SYMBOL_STRUCT)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"struct\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_struct_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = struct_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n            else if (symbol->type == SYMBOL_ENUM)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"enum\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_enum_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = enum_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n\t\t\tfprintf(file_p, \"                }\");\n        }\n        fputs(\"\\n            ]\\n\", file_p);\n        fputs(\"        }\", file_p);\n    }\n\n\tfputs(\"\\n    ]\\n\", file_p);\n\tfputs(\"}\\n\", file_p);\n\n\tfclose(file_p);\n}",
+                    "function_declarator": "generate_json(SymbolTable* table_p)",
+                    "parameter_list": "(SymbolTable* table_p)",
+                    "compound_statement": "{\n    /** Example Format:\n    * {\n    *     \"name\": \"parse_packet\",\n    *     \"return_type\": \"int\",\n    *     \"parameters\": [\n    *         {\"type\": \"const uint8_t *\", \"name\": \"buf\"},\n    *         {\"type\": \"size_t\", \"name\": \"len\"}\n    *     ],\n    *     \"calls\": [\"malloc\", \"memcpy\"],\n    *     \"source\": \"int parse_packet(...) { ... }\"\n    * }\n\t*/\n\n\tFILE* file_p = fopen(\"AST.json\", \"w\");\n\n\tif (file_p == NULL) {\n        fprintf(stderr, \"Error Occurred While creating a file !\");\n\t\treturn;\n    }\n\n\tfputs(\"{\\n\", file_p);\n\tfputs(\"    \\\"files\\\": [\\n\", file_p);\n\n    for (size_t i = 0; i < table_p->vector_of_files.size; i++)\n    {\n        FileAST* ast = table_p->vector_of_files.items[i];\n\t\tif(i == 0)\n\t\t\tfputs(\"        {\\n\", file_p);\n\t\telse\n\t\t\tfputs(\",\\n        {\\n\", file_p);\n        fprintf(file_p, \"            \\\"file name\\\": \\\"%s\\\",\\n\", ast->file_name);\n        fputs(\"            \\\"symbols\\\": [\\n\", file_p);\n        for (size_t j = 0; j < ast->symbols.size; j++)\n        {\n\t\t\tif(j == 0)\n\t\t\t\tfputs(\"                {\\n\", file_p);\n\t\t\telse\n\t\t\t\tfputs(\",\\n                {\\n\", file_p);\n            Symbol* symbol = ast->symbols.items[j];\n            if (symbol->type == SYMBOL_FUNCTION)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"function\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_function_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = function_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n            else if (symbol->type == SYMBOL_STRUCT)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"struct\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_struct_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = struct_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n            else if (symbol->type == SYMBOL_ENUM)\n            {\n\t\t\t\tfputs(\"                    \\\"type\\\":\\\"enum\\\",\\n\", file_p);\n\t\t\t\tbool content_placed = false;\n\t\t\t\tfor(size_t k = 0; k < number_of_enum_properties_to_extract; k++){\n\t\t\t\t\tconst char* property = enum_properties_to_extract[k];\n\t\t\t\t\tconst char* content = symbol_query_property(symbol, property);\n\t\t\t\t\tif(content){\n\t\t\t\t\t\tchar* parsed_content = json_escape_string(content, strlen(content));\n\t\t\t\t\t\tif(!content_placed)\n\t\t\t\t\t\t\tfprintf(file_p, \"                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\telse\n\t\t\t\t\t\t\tfprintf(file_p, \",\\n                    \\\"%s\\\": \\\"%s\\\"\", property, parsed_content);\n\t\t\t\t\t\tcontent_placed = true;\n\t\t\t\t\t\tfree(parsed_content);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tfputs(\"\\n\", file_p);\n            }\n\t\t\tfprintf(file_p, \"                }\");\n        }\n        fputs(\"\\n            ]\\n\", file_p);\n        fputs(\"        }\", file_p);\n    }\n\n\tfputs(\"\\n    ]\\n\", file_p);\n\tfputs(\"}\\n\", file_p);\n\n\tfclose(file_p);\n}",
+                    "call_expression": "fopen(\"AST.json\", \"w\")",
+                    "identifier": "generate_json",
+                    "type_identifier": "SymbolTable",
+                    "comment": "/** Example Format:\n    * {\n    *     \"name\": \"parse_packet\",\n    *     \"return_type\": \"int\",\n    *     \"parameters\": [\n    *         {\"type\": \"const uint8_t *\", \"name\": \"buf\"},\n    *         {\"type\": \"size_t\", \"name\": \"len\"}\n    *     ],\n    *     \"calls\": [\"malloc\", \"memcpy\"],\n    *     \"source\": \"int parse_packet(...) { ... }\"\n    * }\n\t*/"
+                }
+            ]
+        },
+        {
+            "file name": "src/main.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "int main(void)\n{\n    SymbolTable table = {0};\n    symbol_table_init(&table);\n    scan_directory(\"src\", index_file, &table);\n\tgenerate_json(&table);\n\tputs(\"file generated\");\n    symbol_table_free(&table);\n}",
+                    "function_declarator": "main(void)",
+                    "parameter_list": "(void)",
+                    "compound_statement": "{\n    SymbolTable table = {0};\n    symbol_table_init(&table);\n    scan_directory(\"src\", index_file, &table);\n\tgenerate_json(&table);\n\tputs(\"file generated\");\n    symbol_table_free(&table);\n}",
+                    "call_expression": "symbol_table_init(&table)",
+                    "identifier": "main",
+                    "type_identifier": "SymbolTable"
+                }
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/symbol_content_extractor.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "static char* slice_source(const char* src, TSNode node)\n{\n    uint32_t start = ts_node_start_byte(node);\n    uint32_t end = ts_node_end_byte(node);\n    uint32_t len = end - start;\n\n    char* out = malloc(len * sizeof(char) + 1);\n    memcpy(out, src + start, len);\n    out[len] = '\\0';\n    return out;\n}",
+                    "function_declarator": "slice_source(const char* src, TSNode node)",
+                    "parameter_list": "(const char* src, TSNode node)",
+                    "compound_statement": "{\n    uint32_t start = ts_node_start_byte(node);\n    uint32_t end = ts_node_end_byte(node);\n    uint32_t len = end - start;\n\n    char* out = malloc(len * sizeof(char) + 1);\n    memcpy(out, src + start, len);\n    out[len] = '\\0';\n    return out;\n}",
+                    "call_expression": "ts_node_start_byte(node)",
+                    "identifier": "slice_source",
+                    "type_identifier": "TSNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "static TSNode* find_node_by_name(TSNode* node, const char* name) {\n    if (strcmp(ts_node_type(*node), name) == 0)\n        return node;\n\n    uint32_t n = ts_node_child_count(*node);\n    for (uint32_t i = 0; i < n; i++) {\n        TSNode child = ts_node_child(*node, i);\n        TSNode* found = find_node_by_name(&child, name);\n        if (found)\n            return found;\n    }\n\treturn NULL;\n}",
+                    "function_declarator": "find_node_by_name(TSNode* node, const char* name)",
+                    "parameter_list": "(TSNode* node, const char* name)",
+                    "compound_statement": "{\n    if (strcmp(ts_node_type(*node), name) == 0)\n        return node;\n\n    uint32_t n = ts_node_child_count(*node);\n    for (uint32_t i = 0; i < n; i++) {\n        TSNode child = ts_node_child(*node, i);\n        TSNode* found = find_node_by_name(&child, name);\n        if (found)\n            return found;\n    }\n\treturn NULL;\n}",
+                    "call_expression": "strcmp(ts_node_type(*node), name)",
+                    "identifier": "find_node_by_name",
+                    "type_identifier": "TSNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_extract_info_as_function(Symbol* sym, TSNode func_node, const char* source)\n{\n\tfor(size_t i = 0; i < number_of_function_properties_to_extract; i++){\n\t\tconst char* property_name = function_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&func_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "function_declarator": "symbol_extract_info_as_function(Symbol* sym, TSNode func_node, const char* source)",
+                    "parameter_list": "(Symbol* sym, TSNode func_node, const char* source)",
+                    "compound_statement": "{\n\tfor(size_t i = 0; i < number_of_function_properties_to_extract; i++){\n\t\tconst char* property_name = function_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&func_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "call_expression": "find_node_by_name(&func_node, property_name)",
+                    "identifier": "symbol_extract_info_as_function",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_extract_info_as_struct(Symbol* sym, TSNode st_node, const char* source)\n{\n\tfor(size_t i = 0; i < number_of_struct_properties_to_extract; i++){\n\t\tconst char* property_name = struct_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&st_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "function_declarator": "symbol_extract_info_as_struct(Symbol* sym, TSNode st_node, const char* source)",
+                    "parameter_list": "(Symbol* sym, TSNode st_node, const char* source)",
+                    "compound_statement": "{\n\tfor(size_t i = 0; i < number_of_struct_properties_to_extract; i++){\n\t\tconst char* property_name = struct_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&st_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "call_expression": "find_node_by_name(&st_node, property_name)",
+                    "identifier": "symbol_extract_info_as_struct",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_extract_info_as_enum(Symbol* sym, TSNode en_node, const char* source){\n\tfor(size_t i = 0; i < number_of_enum_properties_to_extract; i++){\n\t\tconst char* property_name = enum_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&en_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "function_declarator": "symbol_extract_info_as_enum(Symbol* sym, TSNode en_node, const char* source)",
+                    "parameter_list": "(Symbol* sym, TSNode en_node, const char* source)",
+                    "compound_statement": "{\n\tfor(size_t i = 0; i < number_of_enum_properties_to_extract; i++){\n\t\tconst char* property_name = enum_properties_to_extract[i];\n\t\tTSNode* node = find_node_by_name(&en_node, property_name);\n\t\tif(node)\n\t\t\tsymbol_add_property(sym, property_name, slice_source(source, *node));\n\t}\n}",
+                    "call_expression": "find_node_by_name(&en_node, property_name)",
+                    "identifier": "symbol_extract_info_as_enum",
+                    "type_identifier": "Symbol"
+                }
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/file_symbol_extractor.h",
+            "symbols": [
+
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/symbol_content_extractor.h",
+            "symbols": [
+
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/directory_scanner.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "static int is_c_file(const char *name) {\n    const char *dot = strrchr(name, '.');\n    return dot && (!strcmp(dot, \".c\") || !strcmp(dot, \".h\"));\n}",
+                    "function_declarator": "is_c_file(const char *name)",
+                    "parameter_list": "(const char *name)",
+                    "compound_statement": "{\n    const char *dot = strrchr(name, '.');\n    return dot && (!strcmp(dot, \".c\") || !strcmp(dot, \".h\"));\n}",
+                    "call_expression": "strrchr(name, '.')",
+                    "identifier": "is_c_file"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "static int is_ignored_dir(const char *name) {\n    return !strcmp(name, \".\") ||\n           !strcmp(name, \"..\") ||\n           !strcmp(name, \".git\") ||\n           !strcmp(name, \"build\");\n}",
+                    "function_declarator": "is_ignored_dir(const char *name)",
+                    "parameter_list": "(const char *name)",
+                    "compound_statement": "{\n    return !strcmp(name, \".\") ||\n           !strcmp(name, \"..\") ||\n           !strcmp(name, \".git\") ||\n           !strcmp(name, \"build\");\n}",
+                    "call_expression": "strcmp(name, \".\")",
+                    "identifier": "is_ignored_dir"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void scan_directory(const char *dir, file_callback_t user_call_back, void *user_data) {\n    DIR *d = opendir(dir);\n    if (!d) return;\n\n    struct dirent *ent;\n    while ((ent = readdir(d))) {\n        if (is_ignored_dir(ent->d_name))\n            continue;\n\n        char path[1024];\n        snprintf(path, sizeof(path), \"%s/%s\", dir, ent->d_name);\n\n        struct stat st;\n        if (stat(path, &st) != 0)\n            continue;\n\n        if (S_ISDIR(st.st_mode)) {\n            scan_directory(path, user_call_back, user_data);\n        } else if (S_ISREG(st.st_mode) && is_c_file(ent->d_name)) {\n            user_call_back(path, user_data);\n        }\n    }\n\n    closedir(d);\n}",
+                    "function_declarator": "scan_directory(const char *dir, file_callback_t user_call_back, void *user_data)",
+                    "parameter_list": "(const char *dir, file_callback_t user_call_back, void *user_data)",
+                    "compound_statement": "{\n    DIR *d = opendir(dir);\n    if (!d) return;\n\n    struct dirent *ent;\n    while ((ent = readdir(d))) {\n        if (is_ignored_dir(ent->d_name))\n            continue;\n\n        char path[1024];\n        snprintf(path, sizeof(path), \"%s/%s\", dir, ent->d_name);\n\n        struct stat st;\n        if (stat(path, &st) != 0)\n            continue;\n\n        if (S_ISDIR(st.st_mode)) {\n            scan_directory(path, user_call_back, user_data);\n        } else if (S_ISREG(st.st_mode) && is_c_file(ent->d_name)) {\n            user_call_back(path, user_data);\n        }\n    }\n\n    closedir(d);\n}",
+                    "call_expression": "opendir(dir)",
+                    "identifier": "scan_directory",
+                    "type_identifier": "file_callback_t"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct dirent"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct stat"
+                }
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/symbol_typedef.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "void idx_trie_init(IdxTrieNode* root){\n\tfor(size_t i = 0; i < 128; i++){\n\t\troot->children[i] = NULL;\n\t}\n\troot->identity = 0;\n\troot->is_end_of_word = true;\n}",
+                    "function_declarator": "idx_trie_init(IdxTrieNode* root)",
+                    "parameter_list": "(IdxTrieNode* root)",
+                    "compound_statement": "{\n\tfor(size_t i = 0; i < 128; i++){\n\t\troot->children[i] = NULL;\n\t}\n\troot->identity = 0;\n\troot->is_end_of_word = true;\n}",
+                    "identifier": "idx_trie_init",
+                    "type_identifier": "IdxTrieNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void idx_trie_free(IdxTrieNode* root){\n\tfor(size_t i = 0; i < 128; i++)\n\t\tif(root->children[i]){\n\t\t\tidx_trie_free(root->children[i]);\n\t\t\tfree(root->children[i]);\n\t\t}\n}",
+                    "function_declarator": "idx_trie_free(IdxTrieNode* root)",
+                    "parameter_list": "(IdxTrieNode* root)",
+                    "compound_statement": "{\n\tfor(size_t i = 0; i < 128; i++)\n\t\tif(root->children[i]){\n\t\t\tidx_trie_free(root->children[i]);\n\t\t\tfree(root->children[i]);\n\t\t}\n}",
+                    "call_expression": "idx_trie_free(root->children[i])",
+                    "identifier": "idx_trie_free",
+                    "type_identifier": "IdxTrieNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "IdxTrieNode* idx_trie_query(IdxTrieNode* root, const char* key){\n\tIdxTrieNode *current = root;\n    for (size_t i = 0; i < strlen(key); i++) {\n\t\tIdxTrieNode* child = current->children[(size_t)key[i]];\n        if (!child) {\n            return NULL;\n        }\n        current = child;\n    }\n\tif(current->is_end_of_word)\n\t\treturn current;\n    return NULL;\n}",
+                    "function_declarator": "idx_trie_query(IdxTrieNode* root, const char* key)",
+                    "parameter_list": "(IdxTrieNode* root, const char* key)",
+                    "compound_statement": "{\n\tIdxTrieNode *current = root;\n    for (size_t i = 0; i < strlen(key); i++) {\n\t\tIdxTrieNode* child = current->children[(size_t)key[i]];\n        if (!child) {\n            return NULL;\n        }\n        current = child;\n    }\n\tif(current->is_end_of_word)\n\t\treturn current;\n    return NULL;\n}",
+                    "call_expression": "strlen(key)",
+                    "identifier": "idx_trie_query",
+                    "type_identifier": "IdxTrieNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void idx_trie_push(IdxTrieNode* root, const char* key, size_t value){\n\tIdxTrieNode* current = root;\n\tfor(size_t i = 0; i < strlen(key); i++){\n\t\tif (!current->children[(size_t)key[i]]){\n\t\t\tcurrent->children[(size_t)key[i]] = malloc(sizeof(IdxTrieNode));\n\t\t\tidx_trie_init(current->children[(size_t)key[i]]);\n\t\t\tcurrent->children[(size_t)key[i]]->is_end_of_word = false;\n\t\t}\n\t\tcurrent = current->children[(size_t)key[i]];\n\t}\n\tcurrent->is_end_of_word = true;\n\tcurrent->identity = value;\n}",
+                    "function_declarator": "idx_trie_push(IdxTrieNode* root, const char* key, size_t value)",
+                    "parameter_list": "(IdxTrieNode* root, const char* key, size_t value)",
+                    "compound_statement": "{\n\tIdxTrieNode* current = root;\n\tfor(size_t i = 0; i < strlen(key); i++){\n\t\tif (!current->children[(size_t)key[i]]){\n\t\t\tcurrent->children[(size_t)key[i]] = malloc(sizeof(IdxTrieNode));\n\t\t\tidx_trie_init(current->children[(size_t)key[i]]);\n\t\t\tcurrent->children[(size_t)key[i]]->is_end_of_word = false;\n\t\t}\n\t\tcurrent = current->children[(size_t)key[i]];\n\t}\n\tcurrent->is_end_of_word = true;\n\tcurrent->identity = value;\n}",
+                    "call_expression": "strlen(key)",
+                    "identifier": "idx_trie_push",
+                    "type_identifier": "IdxTrieNode"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void vector_init(Vector* vector){\n\tvector->items = malloc(8 * sizeof(void*));\n\tvector->size = 0;\n\tvector->capacity = 8;\n}",
+                    "function_declarator": "vector_init(Vector* vector)",
+                    "parameter_list": "(Vector* vector)",
+                    "compound_statement": "{\n\tvector->items = malloc(8 * sizeof(void*));\n\tvector->size = 0;\n\tvector->capacity = 8;\n}",
+                    "call_expression": "malloc(8 * sizeof(void*))",
+                    "identifier": "vector_init",
+                    "type_identifier": "Vector"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void vector_free(Vector* vector){\n\tfor(uint32_t i = 0; i < vector->size; i++)\n\t\tfree(vector->items[i]);\n\tfree(vector->items);\n}",
+                    "function_declarator": "vector_free(Vector* vector)",
+                    "parameter_list": "(Vector* vector)",
+                    "compound_statement": "{\n\tfor(uint32_t i = 0; i < vector->size; i++)\n\t\tfree(vector->items[i]);\n\tfree(vector->items);\n}",
+                    "call_expression": "free(vector->items[i])",
+                    "identifier": "vector_free",
+                    "type_identifier": "Vector"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void vector_push_item(Vector* vector, void* item, size_t item_size){\n    if (vector->size == vector->capacity) {\n        vector->capacity = vector->capacity ? vector->capacity * 2 : 8;\n        vector->items = realloc(vector->items, vector->capacity * sizeof(void*));\n    }\n\tvector->items[vector->size] = malloc(item_size);\n\tmemcpy(vector->items[vector->size], item, item_size);\n\tvector->size++;\n}",
+                    "function_declarator": "vector_push_item(Vector* vector, void* item, size_t item_size)",
+                    "parameter_list": "(Vector* vector, void* item, size_t item_size)",
+                    "compound_statement": "{\n    if (vector->size == vector->capacity) {\n        vector->capacity = vector->capacity ? vector->capacity * 2 : 8;\n        vector->items = realloc(vector->items, vector->capacity * sizeof(void*));\n    }\n\tvector->items[vector->size] = malloc(item_size);\n\tmemcpy(vector->items[vector->size], item, item_size);\n\tvector->size++;\n}",
+                    "call_expression": "realloc(vector->items, vector->capacity * sizeof(void*))",
+                    "identifier": "vector_push_item",
+                    "type_identifier": "Vector"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_init(Symbol* symbol, SymbolType type, const char* source_file_name, uint32_t start_line, uint32_t end_line){\n\tsymbol->type = type;\n\tvector_init(&symbol->properties);\n\tidx_trie_init(&symbol->property_index_trie_root);\n\tsymbol->source_file_name = malloc(strlen(source_file_name) * sizeof(char) + 1);\n\tstrcpy(symbol->source_file_name, source_file_name);\n\tsymbol->start_line = start_line;\n\tsymbol->end_line = end_line;\n}",
+                    "function_declarator": "symbol_init(Symbol* symbol, SymbolType type, const char* source_file_name, uint32_t start_line, uint32_t end_line)",
+                    "parameter_list": "(Symbol* symbol, SymbolType type, const char* source_file_name, uint32_t start_line, uint32_t end_line)",
+                    "compound_statement": "{\n\tsymbol->type = type;\n\tvector_init(&symbol->properties);\n\tidx_trie_init(&symbol->property_index_trie_root);\n\tsymbol->source_file_name = malloc(strlen(source_file_name) * sizeof(char) + 1);\n\tstrcpy(symbol->source_file_name, source_file_name);\n\tsymbol->start_line = start_line;\n\tsymbol->end_line = end_line;\n}",
+                    "call_expression": "vector_init(&symbol->properties)",
+                    "identifier": "symbol_init",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_free(Symbol* symbol){\n\tvector_free(&symbol->properties);\n\tidx_trie_free(&symbol->property_index_trie_root);\n\tfree(symbol->source_file_name);\n}",
+                    "function_declarator": "symbol_free(Symbol* symbol)",
+                    "parameter_list": "(Symbol* symbol)",
+                    "compound_statement": "{\n\tvector_free(&symbol->properties);\n\tidx_trie_free(&symbol->property_index_trie_root);\n\tfree(symbol->source_file_name);\n}",
+                    "call_expression": "vector_free(&symbol->properties)",
+                    "identifier": "symbol_free",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_add_property(Symbol* symbol, const char* property_name, const char* content){\n\tvector_push_item(&symbol->properties, (void*)content, strlen(content) * sizeof(char) + 1);\n\tidx_trie_push(&symbol->property_index_trie_root, property_name, symbol->properties.size - 1);\n}",
+                    "function_declarator": "symbol_add_property(Symbol* symbol, const char* property_name, const char* content)",
+                    "parameter_list": "(Symbol* symbol, const char* property_name, const char* content)",
+                    "compound_statement": "{\n\tvector_push_item(&symbol->properties, (void*)content, strlen(content) * sizeof(char) + 1);\n\tidx_trie_push(&symbol->property_index_trie_root, property_name, symbol->properties.size - 1);\n}",
+                    "call_expression": "vector_push_item(&symbol->properties, (void*)content, strlen(content) * sizeof(char) + 1)",
+                    "identifier": "symbol_add_property",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "char* symbol_query_property(Symbol* symbol, const char* property_name){\n\tIdxTrieNode* node = idx_trie_query(&symbol->property_index_trie_root, property_name);\n\tif(node)\n\t\treturn symbol->properties.items[node->identity];\n\treturn NULL;\n}",
+                    "function_declarator": "symbol_query_property(Symbol* symbol, const char* property_name)",
+                    "parameter_list": "(Symbol* symbol, const char* property_name)",
+                    "compound_statement": "{\n\tIdxTrieNode* node = idx_trie_query(&symbol->property_index_trie_root, property_name);\n\tif(node)\n\t\treturn symbol->properties.items[node->identity];\n\treturn NULL;\n}",
+                    "call_expression": "idx_trie_query(&symbol->property_index_trie_root, property_name)",
+                    "identifier": "symbol_query_property",
+                    "type_identifier": "Symbol"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_table_init(SymbolTable *table) {\n\tvector_init(&table->vector_of_files);\n}",
+                    "function_declarator": "symbol_table_init(SymbolTable *table)",
+                    "parameter_list": "(SymbolTable *table)",
+                    "compound_statement": "{\n\tvector_init(&table->vector_of_files);\n}",
+                    "call_expression": "vector_init(&table->vector_of_files)",
+                    "identifier": "symbol_table_init",
+                    "type_identifier": "SymbolTable"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_table_free(SymbolTable *table) {\n\tfor(size_t file_idx = 0; file_idx < table->vector_of_files.size; file_idx++){\n\t\tFileAST* ast = table->vector_of_files.items[file_idx];\n\t\tfree(ast->file_name);\n\t\tfor(size_t symbol_idx = 0; symbol_idx < ast->symbols.size; symbol_idx++)\n\t\t\tsymbol_free(ast->symbols.items[symbol_idx]);\n\t\tvector_free(&ast->symbols);\n\t}\n\tvector_free(&table->vector_of_files);\n}",
+                    "function_declarator": "symbol_table_free(SymbolTable *table)",
+                    "parameter_list": "(SymbolTable *table)",
+                    "compound_statement": "{\n\tfor(size_t file_idx = 0; file_idx < table->vector_of_files.size; file_idx++){\n\t\tFileAST* ast = table->vector_of_files.items[file_idx];\n\t\tfree(ast->file_name);\n\t\tfor(size_t symbol_idx = 0; symbol_idx < ast->symbols.size; symbol_idx++)\n\t\t\tsymbol_free(ast->symbols.items[symbol_idx]);\n\t\tvector_free(&ast->symbols);\n\t}\n\tvector_free(&table->vector_of_files);\n}",
+                    "call_expression": "free(ast->file_name)",
+                    "identifier": "symbol_table_free",
+                    "type_identifier": "SymbolTable"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_table_add_file(SymbolTable *table, const char* file_name){\n\tFileAST new_ast;\n\tnew_ast.file_name = malloc(strlen(file_name) * sizeof(char) + 1);\n\tstrcpy(new_ast.file_name, file_name);\n\tvector_init(&new_ast.symbols);\n\tvector_push_item(&table->vector_of_files, &new_ast, sizeof(new_ast));\n}",
+                    "function_declarator": "symbol_table_add_file(SymbolTable *table, const char* file_name)",
+                    "parameter_list": "(SymbolTable *table, const char* file_name)",
+                    "compound_statement": "{\n\tFileAST new_ast;\n\tnew_ast.file_name = malloc(strlen(file_name) * sizeof(char) + 1);\n\tstrcpy(new_ast.file_name, file_name);\n\tvector_init(&new_ast.symbols);\n\tvector_push_item(&table->vector_of_files, &new_ast, sizeof(new_ast));\n}",
+                    "call_expression": "malloc(strlen(file_name) * sizeof(char) + 1)",
+                    "identifier": "symbol_table_add_file",
+                    "type_identifier": "SymbolTable"
+                },
+                {
+                    "type":"function",
+                    "function_definition": "void symbol_table_add_symbol(SymbolTable *table, Symbol symbol) {\n\tVector* symbols_vector_p = &((FileAST*)table->vector_of_files.items[table->vector_of_files.size - 1])->symbols;\n\tvector_push_item(symbols_vector_p, &symbol, sizeof(Symbol));\n}",
+                    "function_declarator": "symbol_table_add_symbol(SymbolTable *table, Symbol symbol)",
+                    "parameter_list": "(SymbolTable *table, Symbol symbol)",
+                    "compound_statement": "{\n\tVector* symbols_vector_p = &((FileAST*)table->vector_of_files.items[table->vector_of_files.size - 1])->symbols;\n\tvector_push_item(symbols_vector_p, &symbol, sizeof(Symbol));\n}",
+                    "call_expression": "vector_push_item(symbols_vector_p, &symbol, sizeof(Symbol))",
+                    "identifier": "symbol_table_add_symbol",
+                    "type_identifier": "SymbolTable"
+                }
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/directory_scanner.h",
+            "symbols": [
+
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/symbol_typedef.h",
+            "symbols": [
+                {
+                    "type":"enum",
+                    "enum_specifier": "enum\n{\n    SYMBOL_FUNCTION,\n    SYMBOL_STRUCT,\n\tSYMBOL_ENUM\n}",
+                    "identifier": "SYMBOL_FUNCTION"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct idx_trie_node_st{\n\tstruct idx_trie_node_st *children[128];\n\tsize_t identity;\n\tbool is_end_of_word;\n}"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct idx_trie_node_st"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct vector_st{\n\tvoid** items;\n    size_t size;\n    size_t capacity;\n}"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct symbol_st\n{\n    SymbolType type;\n\tVector properties;\n\tIdxTrieNode property_index_trie_root;\n    char* source_file_name;\n    uint32_t start_line;\n    uint32_t end_line;\n}"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct file_ast_st{\n\tchar* file_name;\n\tVector symbols;\n}"
+                },
+                {
+                    "type":"struct",
+                    "struct_specifier": "struct\n{\n\tVector vector_of_files;\n}"
+                }
+            ]
+        },
+        {
+            "file name": "src/symbol_extractor/file_symbol_extractor.c",
+            "symbols": [
+                {
+                    "type":"function",
+                    "function_definition": "void index_file(const char *path, void *user_data) {\n\tSymbolTable* table = user_data;\n\n\t/* read file */\n    FILE *f = fopen(path, \"rb\");\n    if (!f) return;\n\n    fseek(f, 0, SEEK_END);\n    long size = ftell(f);\n    rewind(f);\n\n    char *source = malloc((unsigned long)size + 1);\n    fread(source, 1, (unsigned long)size, f);\n    source[size] = 0;\n    fclose(f);\n\n\tsymbol_table_add_file(table, path);\n\n    TSParser *parser = ts_parser_new();\n    ts_parser_set_language(parser, tree_sitter_c());\n\n    TSTree *tree = ts_parser_parse_string(\n        parser, NULL, source, (uint32_t)size);\n\n    TSNode root = ts_tree_root_node(tree);\n    TSTreeCursor cursor = ts_tree_cursor_new(root);\n\n\tbool backtracking = false;\n\twhile(1){\n\t\tTSNode node = ts_tree_cursor_current_node(&cursor);\n        const char *type = ts_node_type(node);\n\n\t\tif(backtracking){\n\t\t\tif(ts_tree_cursor_goto_next_sibling(&cursor))\n\t\t\t\tbacktracking = false;\n\t\t\telse if(!ts_tree_cursor_goto_parent(&cursor))\n\t\t\t\tbreak;\n\t\t} else{\n\t\t\t/* Function */\n            if (strcmp(type, \"function_definition\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_FUNCTION, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_function(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n            /* Struct */\n            else if (strcmp(type, \"struct_specifier\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_STRUCT, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_struct(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n            /* Enum */\n            else if (strcmp(type, \"enum_specifier\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_ENUM, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_enum(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n\n\t\t\tbacktracking = !ts_tree_cursor_goto_first_child(&cursor);\n\t\t}\n\t}\n\n    ts_tree_cursor_delete(&cursor);\n    ts_tree_delete(tree);\n    ts_parser_delete(parser);\n\tfree(source);\n}",
+                    "function_declarator": "index_file(const char *path, void *user_data)",
+                    "parameter_list": "(const char *path, void *user_data)",
+                    "compound_statement": "{\n\tSymbolTable* table = user_data;\n\n\t/* read file */\n    FILE *f = fopen(path, \"rb\");\n    if (!f) return;\n\n    fseek(f, 0, SEEK_END);\n    long size = ftell(f);\n    rewind(f);\n\n    char *source = malloc((unsigned long)size + 1);\n    fread(source, 1, (unsigned long)size, f);\n    source[size] = 0;\n    fclose(f);\n\n\tsymbol_table_add_file(table, path);\n\n    TSParser *parser = ts_parser_new();\n    ts_parser_set_language(parser, tree_sitter_c());\n\n    TSTree *tree = ts_parser_parse_string(\n        parser, NULL, source, (uint32_t)size);\n\n    TSNode root = ts_tree_root_node(tree);\n    TSTreeCursor cursor = ts_tree_cursor_new(root);\n\n\tbool backtracking = false;\n\twhile(1){\n\t\tTSNode node = ts_tree_cursor_current_node(&cursor);\n        const char *type = ts_node_type(node);\n\n\t\tif(backtracking){\n\t\t\tif(ts_tree_cursor_goto_next_sibling(&cursor))\n\t\t\t\tbacktracking = false;\n\t\t\telse if(!ts_tree_cursor_goto_parent(&cursor))\n\t\t\t\tbreak;\n\t\t} else{\n\t\t\t/* Function */\n            if (strcmp(type, \"function_definition\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_FUNCTION, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_function(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n            /* Struct */\n            else if (strcmp(type, \"struct_specifier\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_STRUCT, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_struct(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n            /* Enum */\n            else if (strcmp(type, \"enum_specifier\") == 0) {\n\t\t\t\tSymbol symbol = {0};\n\t\t\t\tsymbol_init(&symbol, SYMBOL_ENUM, path, ts_node_start_point(node).row + 1, ts_node_end_point(node).row + 1);\n\t\t\t\tsymbol_extract_info_as_enum(&symbol, node, source);\n\t\t\t\tsymbol_table_add_symbol(table, symbol);\n            }\n\n\t\t\tbacktracking = !ts_tree_cursor_goto_first_child(&cursor);\n\t\t}\n\t}\n\n    ts_tree_cursor_delete(&cursor);\n    ts_tree_delete(tree);\n    ts_parser_delete(parser);\n\tfree(source);\n}",
+                    "call_expression": "fopen(path, \"rb\")",
+                    "identifier": "index_file",
+                    "type_identifier": "SymbolTable",
+                    "comment": "/* read file */"
+                }
+            ]
+        }
+    ]
+}
