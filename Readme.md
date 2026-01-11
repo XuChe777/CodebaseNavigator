@@ -28,3 +28,6 @@ cmake --build ./build
 ```
 The application's executable is at `./build/cba`
 `cba` takes one command line argument `file_path`
+
+## License
+MIT License
