@@ -1,10 +1,37 @@
 #include "symbol_content_extractor.h"
 
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 #include <tree_sitter/api.h>
 
 #include "symbol_typedef.h"
+
+const char* function_properties_to_extract[] = {
+	"name",
+	"function_definition",
+	"call_expression",
+	"identifier",
+	"comment"
+};
+const size_t number_of_function_properties_to_extract = sizeof(function_properties_to_extract) / sizeof(const char*);
+
+const char* struct_properties_to_extract[] = {
+	"name",
+	"struct_specifier",
+	"identifier",
+	"comment"
+};
+const size_t number_of_struct_properties_to_extract = sizeof(struct_properties_to_extract) / sizeof(const char*);
+
+const char* enum_properties_to_extract[] = {
+	"name",
+	"enum_specifier",
+	"identifier",
+	"comment"
+};
+const size_t number_of_enum_properties_to_extract = sizeof(enum_properties_to_extract) / sizeof(const char*);
+
 
 static char* slice_source(const char* src, TSNode node)
 {
@@ -32,37 +59,31 @@ static TSNode* find_node_by_name(TSNode* node, const char* name) {
 	return NULL;
 }
 
-void symbol_extract_function(Symbol* sym, TSNode func_node, const char* source, const char* file)
+void symbol_extract_info_as_function(Symbol* sym, TSNode func_node, const char* source)
 {
-	TSNode* declarator = find_node_by_name(&func_node, "identifier");
-    // TSNode declarator = ts_node_child_by_field_name(func_node, "declarator", 10);
-    // if (ts_node_is_null(declarator)) declarator = ts_node_child(func_node, 1);
-
-	TSNode* identifier_node = find_node_by_name(&func_node, "identifier");
-	if(identifier_node)
-		sym->name = slice_source(source, *identifier_node);
-
-    sym->type = SYMBOL_FUNCTION;
-    sym->signature = slice_source(source, func_node);
-    sym->start_line = ts_node_start_point(func_node).row + 1;
-    sym->end_line = ts_node_end_point(func_node).row + 1;
-    sym->source_file_name = malloc(strlen(file) * sizeof(char) + 1);
-    strcpy(sym->source_file_name, file);
+	for(size_t i = 0; i < number_of_function_properties_to_extract; i++){
+		const char* property_name = function_properties_to_extract[i];
+		TSNode* node = find_node_by_name(&func_node, property_name);
+		if(node)
+			symbol_add_property(sym, property_name, slice_source(source, *node));
+	}
 }
 
-void symbol_extract_struct(Symbol* sym, TSNode st_node, const char* source, const char* file)
+void symbol_extract_info_as_struct(Symbol* sym, TSNode st_node, const char* source)
 {
-    TSNode name_node = ts_node_child_by_field_name(st_node, "name", 4);
-    if (ts_node_is_null(name_node)) name_node = ts_node_child(st_node, 1);
+	for(size_t i = 0; i < number_of_struct_properties_to_extract; i++){
+		const char* property_name = struct_properties_to_extract[i];
+		TSNode* node = find_node_by_name(&st_node, property_name);
+		if(node)
+			symbol_add_property(sym, property_name, slice_source(source, *node));
+	}
+}
 
-	TSNode* identifier_node = find_node_by_name(&st_node, "identifier");
-	if(identifier_node)
-		sym->name = slice_source(source, *identifier_node);
-
-    sym->type = SYMBOL_STRUCT;
-    sym->signature = slice_source(source, st_node);
-    sym->start_line = ts_node_start_point(st_node).row + 1;
-    sym->end_line = ts_node_end_point(st_node).row + 1;
-    sym->source_file_name = malloc(strlen(file) * sizeof(char) + 1);
-    strcpy(sym->source_file_name, file);
+void symbol_extract_info_as_enum(Symbol* sym, TSNode en_node, const char* source){
+	for(size_t i = 0; i < number_of_enum_properties_to_extract; i++){
+		const char* property_name = enum_properties_to_extract[i];
+		TSNode* node = find_node_by_name(&en_node, property_name);
+		if(node)
+			symbol_add_property(sym, property_name, slice_source(source, *node));
+	}
 }
