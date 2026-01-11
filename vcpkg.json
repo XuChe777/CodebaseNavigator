@@ -1,7 +1,8 @@
 {
   "dependencies": [
-    "sdl3",
+    "cjson",
     "tree-sitter",
-    "tree-sitter-c"
+    "tree-sitter-c",
+    "curl"
   ]
 }

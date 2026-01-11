@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(
-    code_navigator
-    VERSION 0.1.0
+	codebase_analyzer
+    VERSION 1.0.0
     LANGUAGES C
 )
 
@@ -24,8 +24,8 @@ endif()
 # ------------------------------
 # Dependencies
 # ------------------------------
-find_package(SDL3 REQUIRED)
-# find_package(tree-sitter-c CONFIG REQUIRED)
+find_package(cJSON REQUIRED)
+find_package(CURL REQUIRED)
 
 # ------------------------------
 # Warnings & compiler flags
@@ -55,7 +55,7 @@ endif()
 # ------------------------------
 # Project layout
 # ------------------------------
-add_executable(App
+add_executable(cba
 	src/symbol_extractor/directory_scanner.c
 	src/symbol_extractor/file_symbol_extractor.c
 	src/symbol_extractor/symbol_content_extractor.c
@@ -63,19 +63,12 @@ add_executable(App
 	src/main.c
 	src/parser.c
 )
-target_link_libraries(App
-	# SDL3::SDL3
+target_link_libraries(cba
 	PRIVATE
 	tree-sitter
 	tree-sitter-c
-)
-
-add_executable(SDL_Test
-	tests/sdl3.c
-)
-target_link_libraries(SDL_Test
-	PRIVATE
-	SDL3::SDL3
+	cjson
+	CURL::libcurl
 )
 
 add_executable(Treesitter_Test
@@ -90,5 +83,5 @@ target_link_libraries(Treesitter_Test
 # ------------------------------
 # Installation (optional)
 # ------------------------------
-# install(TARGETS code_navigator
-#         RUNTIME DESTINATION bin)
+install(TARGETS cba
+        RUNTIME DESTINATION bin)
