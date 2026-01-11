@@ -97,7 +97,7 @@ void generate_json(SymbolTable* table_p)
             }
             else if (symbol->type == SYMBOL_STRUCT)
             {
-				fputs("                    \"type\":\"struct\"\n", file_p);
+				fputs("                    \"type\":\"struct\",\n", file_p);
 				bool content_placed = false;
 				for(size_t k = 0; k < number_of_struct_properties_to_extract; k++){
 					const char* property = struct_properties_to_extract[k];
@@ -116,7 +116,7 @@ void generate_json(SymbolTable* table_p)
             }
             else if (symbol->type == SYMBOL_ENUM)
             {
-				fputs("                    \"type\":\"enum\"\n", file_p);
+				fputs("                    \"type\":\"enum\",\n", file_p);
 				for(size_t k = 1; k < number_of_enum_properties_to_extract; k++){
 					const char* property = enum_properties_to_extract[k];
 					const char* content = symbol_query_property(symbol, property);
