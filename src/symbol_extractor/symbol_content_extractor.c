@@ -10,8 +10,12 @@
 const char* function_properties_to_extract[] = {
 	"name",
 	"function_definition",
+	"function_declarator",
+	"parameter_list",
+	"compound_statement",
 	"call_expression",
 	"identifier",
+	"type_identifier",
 	"comment"
 };
 const size_t number_of_function_properties_to_extract = sizeof(function_properties_to_extract) / sizeof(const char*);

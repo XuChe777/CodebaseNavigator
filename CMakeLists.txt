@@ -61,6 +61,7 @@ add_executable(App
 	src/symbol_extractor/symbol_content_extractor.c
 	src/symbol_extractor/symbol_typedef.c
 	src/main.c
+	src/parser.c
 )
 target_link_libraries(App
 	# SDL3::SDL3
